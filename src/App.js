@@ -1,25 +1,49 @@
-import logo from './logo.svg';
-import './App.css';
+import { useEffect, useState } from 'react';
 
-function App() {
+import ContactCards from './ContactCards';
+
+import useFetch from 'react-fetch-hook';
+import createTrigger from 'react-use-trigger';
+import useTrigger from 'react-use-trigger/useTrigger';
+
+const requestTrigger = createTrigger();
+
+const App = () => {
+  const requestTriggerValue = useTrigger(requestTrigger);
+
+  const url = 'https://random-data-api.com/api/users/random_user?size=10';
+
+  const [contactList, setContactList] = useState();
+
+  // console.log( data )
+  const { data } = useFetch(url, {
+    depends: [requestTriggerValue],
+  });
+
+  useEffect(() => {
+    setContactList(data);
+  }, [data]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+    <div className={'bg-gray-300'}>
+      <section className={'py-5 px-24'}>
+        <button
+          className={
+            'mt-7 bg-red-400 hover:bg-red-700 text-white font-bold py-2 px-4 rounded'
+          }
+          onClick={() => {
+            requestTrigger();
+          }}
         >
-          Learn React
-        </a>
-      </header>
+          Fetch Random Users
+        </button>
+      </section>
+
+      <section className={'grid sm:grid-cols-2 md:grid-cols-4 gap-6 p-20'}>
+        <ContactCards contactList={contactList} />
+      </section>
     </div>
   );
-}
+};
 
 export default App;
